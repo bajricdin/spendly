@@ -1,17 +1,23 @@
-import { Text, View, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, Text } from 'react-native';
+import TransactionCard from '@/components/TransactionCard';
+import { transactions } from '@/data/transactions';
 
-export default function Index() {
+// The first screen of the app (index = home). Shows all transactions.
+export default function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text>Edit src/app/index.tsx to edit this screen.</Text>
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* a derived value: calculated from the data, not stored anywhere */}
+      <Text style={styles.count}>{transactions.length} transactions</Text>
+
+      {/* .map turns every transaction into a card; key helps React track each one */}
+      {transactions.map((transaction) => (
+        <TransactionCard key={transaction.id} transaction={transaction} />
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  container: { padding: 16, gap: 12 },
+  count: { fontSize: 14, color: '#555' },
 });
