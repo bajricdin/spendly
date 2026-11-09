@@ -2,7 +2,7 @@
 
 Spendly is a mobile app that helps users track their income and expenses, organize transactions by category, and monitor their monthly spending. Users can set a monthly budget, view spending statistics, and manage their personal financial records in one place.
 
-Built with React Native and Expo (SDK 57) for the Cross-Platform Development course at International Burch University.
+Built with React Native and Expo (SDK 58) for the Cross-Platform Development course at International Burch University.
 
 ## Run the project
 
