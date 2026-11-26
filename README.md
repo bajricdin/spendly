@@ -16,7 +16,9 @@ Then scan the QR code with the Expo Go app on your phone.
 ## Features
 
 - [x] List of transactions (mock data)
-- [ ] Consistent styling and theme
+- [x] Consistent styling with a light and dark theme
+- [x] Summary of income, expenses and balance
+- [x] Layout for phones and tablets (1, 2 or 3 columns)
 - [ ] Transaction list with FlatList, empty and loading states
 - [ ] Transaction details screen
 - [ ] Tabs and a modal
