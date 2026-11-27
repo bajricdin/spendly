@@ -10,15 +10,24 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import EmptyState from '@/components/EmptyState';
+import FilterChip from '@/components/FilterChip';
 import SummaryRow from '@/components/SummaryRow';
 import TransactionCard from '@/components/TransactionCard';
 import { FontSize, Radius, Spacing } from '@/constants/theme';
 import { fetchTransactions } from '@/data/api';
 import { useTheme } from '@/hooks/use-theme';
-import type { Transaction } from '@/types';
+import type { Transaction, TransactionType } from '@/types';
 
 // The three states of loading: waiting, failed, or done.
 type Status = 'loading' | 'error' | 'ready';
+// Which transactions to show: all of them, or only one type.
+type Filter = 'all' | TransactionType;
+
+const FILTERS: { value: Filter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'income', label: 'Income' },
+  { value: 'expense', label: 'Expenses' },
+];
 
 // The first screen of the app (index = home). Shows all transactions.
 export default function HomeScreen() {
@@ -29,6 +38,7 @@ export default function HomeScreen() {
   const [status, setStatus] = useState<Status>('loading');
   const [attempt, setAttempt] = useState(0); // increases on "Try again" to load again
   const [refreshing, setRefreshing] = useState(false); // pull-to-refresh spinner
+  const [filter, setFilter] = useState<Filter>('all');
 
   // Load the transactions when the screen opens, and again when "attempt" changes.
   useEffect(() => {
@@ -74,6 +84,9 @@ export default function HomeScreen() {
   const columns = width >= 900 ? 3 : width >= 600 ? 2 : 1;
   const cardWidth = (width - 2 * Spacing.md - (columns - 1) * Spacing.md) / columns;
 
+  // Derived value: the list we actually show, calculated from state on every render.
+  const visible = filter === 'all' ? transactions : transactions.filter((t) => t.type === filter);
+
   // While loading for the first time: only a spinner.
   if (status === 'loading') {
     return (
@@ -100,16 +113,36 @@ export default function HomeScreen() {
       key={columns} // a new list when the number of columns changes (required by FlatList)
       numColumns={columns}
       columnWrapperStyle={columns > 1 ? { gap: Spacing.md } : undefined} // only allowed with 2+ columns
-      data={transactions}
+      data={visible}
       keyExtractor={(t) => t.id}
       renderItem={({ item }) => <TransactionCard transaction={item} style={{ width: cardWidth }} />}
       ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
       // above the items, scrolls together with them
-      ListHeaderComponent={<SummaryRow transactions={transactions} />}
-      ListHeaderComponentStyle={styles.header}
-      // shown instead of the items when the list is empty
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <SummaryRow transactions={transactions} />
+          <View style={styles.chips}>
+            {FILTERS.map((f) => (
+              <FilterChip
+                key={f.value}
+                label={f.label}
+                selected={filter === f.value}
+                onPress={() => setFilter(f.value)}
+              />
+            ))}
+          </View>
+        </View>
+      }
+      // shown instead of the items when "visible" is empty
       ListEmptyComponent={
-        <EmptyState title="No transactions yet" message="Your transactions will appear here." />
+        filter === 'all' ? (
+          <EmptyState title="No transactions yet" message="Your transactions will appear here." />
+        ) : (
+          <EmptyState
+            title={filter === 'income' ? 'No income yet' : 'No expenses yet'}
+            message="Choose another filter."
+          />
+        )
       }
       refreshing={refreshing}
       onRefresh={refresh}
@@ -124,5 +157,6 @@ const styles = StyleSheet.create({
   error: { fontSize: FontSize.body },
   button: { paddingVertical: Spacing.sm, paddingHorizontal: Spacing.lg, borderRadius: Radius.md },
   list: { padding: Spacing.md, flexGrow: 1 },
-  header: { marginBottom: Spacing.md },
+  header: { gap: Spacing.md, marginBottom: Spacing.md },
+  chips: { flexDirection: 'row', gap: Spacing.sm },
 });
