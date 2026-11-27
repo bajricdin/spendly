@@ -28,6 +28,7 @@ export default function HomeScreen() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [status, setStatus] = useState<Status>('loading');
   const [attempt, setAttempt] = useState(0); // increases on "Try again" to load again
+  const [refreshing, setRefreshing] = useState(false); // pull-to-refresh spinner
 
   // Load the transactions when the screen opens, and again when "attempt" changes.
   useEffect(() => {
@@ -54,6 +55,18 @@ export default function HomeScreen() {
   function retry() {
     setStatus('loading');
     setAttempt((a) => a + 1); // a new attempt number makes the effect run again
+  }
+
+  // Pull-to-refresh: the old list stays visible under the small spinner.
+  async function refresh() {
+    setRefreshing(true);
+    try {
+      setTransactions(await fetchTransactions());
+    } catch {
+      // keep the old list if refreshing fails
+    } finally {
+      setRefreshing(false); // always stop the spinner, success or not
+    }
   }
 
   // Grid: 1 column on phones, 2 from 600 wide, 3 from 900 wide.
@@ -98,6 +111,8 @@ export default function HomeScreen() {
       ListEmptyComponent={
         <EmptyState title="No transactions yet" message="Your transactions will appear here." />
       }
+      refreshing={refreshing}
+      onRefresh={refresh}
       // flexGrow: 1 lets the empty state fill the screen so it can be centred
       contentContainerStyle={[styles.list, { paddingBottom: Spacing.md + insets.bottom }]}
     />
