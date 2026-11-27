@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Pressable,
   StyleSheet,
@@ -79,6 +80,19 @@ export default function HomeScreen() {
     }
   }
 
+  // Long press on a card: ask first, then remove it from the list.
+  function confirmDelete(transaction: Transaction) {
+    Alert.alert('Delete transaction?', `"${transaction.title}" will be removed.`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        // keep every transaction except the one we delete
+        onPress: () => setTransactions((list) => list.filter((t) => t.id !== transaction.id)),
+      },
+    ]);
+  }
+
   // Grid: 1 column on phones, 2 from 600 wide, 3 from 900 wide.
   const { width } = useWindowDimensions();
   const columns = width >= 900 ? 3 : width >= 600 ? 2 : 1;
@@ -115,7 +129,13 @@ export default function HomeScreen() {
       columnWrapperStyle={columns > 1 ? { gap: Spacing.md } : undefined} // only allowed with 2+ columns
       data={visible}
       keyExtractor={(t) => t.id}
-      renderItem={({ item }) => <TransactionCard transaction={item} style={{ width: cardWidth }} />}
+      renderItem={({ item }) => (
+        <TransactionCard
+          transaction={item}
+          style={{ width: cardWidth }}
+          onLongPress={() => confirmDelete(item)}
+        />
+      )}
       ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
       // above the items, scrolls together with them
       ListHeaderComponent={

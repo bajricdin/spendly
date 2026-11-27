@@ -21,10 +21,11 @@ const CATEGORY_ICONS: Record<Category, string> = {
 type TransactionCardProps = {
   transaction: Transaction;
   style?: StyleProp<ViewStyle>; // optional: lets the screen set the card's width
+  onLongPress?: () => void; // optional: what happens when the card is held down
 };
 
 // Shows one transaction in the list. The whole card can be pressed.
-export default function TransactionCard({ transaction, style }: TransactionCardProps) {
+export default function TransactionCard({ transaction, style, onLongPress }: TransactionCardProps) {
   const theme = useTheme(); // colours for light or dark mode
   const isIncome = transaction.type === 'income';
   const amountColor = isIncome ? theme.income : theme.expense;
@@ -32,6 +33,12 @@ export default function TransactionCard({ transaction, style }: TransactionCardP
   return (
     <Pressable
       onPress={() => console.log('Open', transaction.id)}
+      onLongPress={onLongPress} // hold the card for about half a second
+      // for screen readers (VoiceOver / TalkBack): what this is and what it does
+      accessibilityRole="button"
+      accessibilityLabel={`${transaction.title}, ${transaction.category}, ${formatAmount(transaction)}`}
+      accessibilityHint="Long press to delete"
+      android_ripple={{ color: theme.border }} // touch ripple effect on Android
       // layout from styles, colours from the theme, "style" prop LAST so it wins
       style={({ pressed }) => [
         styles.card,
