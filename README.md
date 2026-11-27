@@ -13,13 +13,22 @@ npx expo start
 
 Then scan the QR code with the Expo Go app on your phone.
 
+## Screenshots
+
+| Light mode | Dark mode |
+|---|---|
+| ![Home in light mode](docs/home-light.png) | ![Home in dark mode](docs/home-dark.png) |
+
 ## Features
 
 - [x] List of transactions (mock data)
 - [x] Consistent styling with a light and dark theme
 - [x] Summary of income, expenses and balance
 - [x] Layout for phones and tablets (1, 2 or 3 columns)
-- [ ] Transaction list with FlatList, empty and loading states
+- [x] Transaction list with FlatList, loading, error and empty states
+- [x] Pull to refresh
+- [x] Filter by income or expenses
+- [x] Delete a transaction with a long press
 - [ ] Transaction details screen
 - [ ] Tabs and a modal
 - [ ] Add and edit transactions with validation
