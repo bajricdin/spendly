@@ -1,5 +1,6 @@
 import { FlatList, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import EmptyState from '@/components/EmptyState';
 import SummaryRow from '@/components/SummaryRow';
 import TransactionCard from '@/components/TransactionCard';
 import { Spacing } from '@/constants/theme';
@@ -26,7 +27,12 @@ export default function HomeScreen() {
       // above the items, scrolls together with them
       ListHeaderComponent={<SummaryRow transactions={transactions} />}
       ListHeaderComponentStyle={{ marginBottom: Spacing.md }}
-      contentContainerStyle={{ padding: Spacing.md, paddingBottom: Spacing.md + insets.bottom }}
+      // shown instead of the items when the list is empty
+      ListEmptyComponent={
+        <EmptyState title="No transactions yet" message="Your transactions will appear here." />
+      }
+      // flexGrow: 1 lets the empty state fill the screen so it can be centred
+      contentContainerStyle={{ padding: Spacing.md, paddingBottom: Spacing.md + insets.bottom, flexGrow: 1 }}
     />
   );
 }
